@@ -2,38 +2,27 @@ package edu.fatec.exame.model;
 
 import java.time.LocalDate;
 
-/**
- * Classe de modelo (entidade) que representa um Exame médico.
- * Segue o padrão JavaBean: atributos privados com getters e setters públicos.
- * Cada atributo corresponde a uma coluna na tabela 'exame' do banco de dados.
- */
 public class Exame {
 
-    // Identificador único do exame no banco de dados.
-    // Começa em 0 para indicar que ainda não foi salvo (sem ID gerado).
+    // id começa em 0 pq ainda não foi salvo no banco
     private long id = 0;
 
-    // Tipo do exame (ex: "Sangue", "Raio-X", "Ultrassom").
+    // tipo de exame: sangue, raio-x, ultrassom, etc
     private String tipo = "";
 
-    // Data em que o exame foi realizado.
-    // Usa LocalDate, que é a classe moderna do Java para datas sem hora.
+    // data em que o exame foi feito
     private LocalDate dataRealizacao = LocalDate.now();
 
-    // Resultado do exame (ex: "Normal", "Alterado", valor numérico, etc).
+    // o que o exame mostrou (normal, alterado, etc)
     private String resultado = "";
 
-    // Campo livre para observações adicionais do médico ou laboratório.
+    // observacoes extras que o medico queira registrar
     private String observacao = "";
 
-    // Nome do paciente que realizou o exame.
-    // Armazenado como String simples (sem FK para objeto Paciente),
-    // seguindo o padrão adotado no projeto.
+    // nome do paciente que fez o exame
     private String nomePaciente = "";
 
     // --- Getters e Setters ---
-    // Necessários para que o JavaFX (via Control) acesse e modifique os dados,
-    // e para que o DAO consiga montar o objeto ao ler do banco.
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -53,10 +42,7 @@ public class Exame {
     public String getNomePaciente() { return nomePaciente; }
     public void setNomePaciente(String nomePaciente) { this.nomePaciente = nomePaciente; }
 
-    /**
-     * Representação textual do exame.
-     * Usada em logs e em componentes visuais que exibem o objeto diretamente.
-     */
+    // usado em logs pra identificar o exame rapidamente
     @Override
     public String toString() {
         return tipo + " - " + nomePaciente;

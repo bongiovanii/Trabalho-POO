@@ -14,77 +14,54 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-/**
- * Camada de controle (Control) do CRUD de Exame.
- *
- * Responsabilidades:
- *  - Manter as Properties JavaFX que ficam ligadas (binding) aos campos da tela
- *  - Converter entre objeto Exame (entidade) e Properties (estado da tela)
- *  - Chamar o DAO para operações de banco de dados
- *  - Manter a lista observável que alimenta o TableView
- */
+// Control do CRUD de Exame
+// faz a ponte entre a tela (Boundary) e o banco (DAO)
 public class ExameControl {
 
-    // Lista observável: quando alterada, o TableView atualiza automaticamente na tela.
+    // lista que alimenta o TableView - quando muda, a tabela atualiza sozinha
     private ObservableList<Exame> lista = FXCollections.observableArrayList();
 
-    // --- Properties JavaFX ---
-    // Cada campo do formulário na tela fica "ligado" (bound) a uma dessas properties.
-    // Quando o usuário digita, a property atualiza; quando a property muda, a tela atualiza.
-    private LongProperty id                        = new SimpleLongProperty(0);
-    private StringProperty tipo                    = new SimpleStringProperty("");
+    // properties ligadas aos campos da tela via binding
+    private LongProperty id = new SimpleLongProperty(0);
+    private StringProperty tipo = new SimpleStringProperty("");
     private ObjectProperty<LocalDate> dataRealizacao = new SimpleObjectProperty<>(LocalDate.now());
-    private StringProperty resultado               = new SimpleStringProperty("");
-    private StringProperty observacao              = new SimpleStringProperty("");
-    private StringProperty nomePaciente            = new SimpleStringProperty("");
+    private StringProperty resultado = new SimpleStringProperty("");
+    private StringProperty observacao = new SimpleStringProperty("");
+    private StringProperty nomePaciente = new SimpleStringProperty("");
 
-    // Instância do DAO: toda comunicação com o banco passa por aqui.
+    // toda operacao de banco passa pelo dao
     private ExameDAO dao = new ExameDAOImplementation();
 
-    /**
-     * Construtor: ao criar o Control, já carrega os exames do banco
-     * para popular o TableView assim que a tela abrir.
-     */
+    // ja carrega os exames ao abrir a tela
     public ExameControl() {
         carregar();
     }
 
-    /**
-     * Preenche as Properties com os dados de um objeto Exame.
-     * Chamado quando o usuário clica em uma linha do TableView para editar.
-     * @param e exame selecionado na tabela (pode ser null se nada selecionado)
-     */
-    public void fromEntity(Exame e) {
-        if (e != null) {
-            id.set(e.getId());
-            tipo.set(e.getTipo());
-            dataRealizacao.set(e.getDataRealizacao());
-            resultado.set(e.getResultado());
-            observacao.set(e.getObservacao());
-            nomePaciente.set(e.getNomePaciente());
+    // preenche os campos quando o usuario clica numa linha da tabela
+    public void fromEntity(Exame exame) {
+        if (exame != null) {
+            id.set(exame.getId());
+            tipo.set(exame.getTipo());
+            dataRealizacao.set(exame.getDataRealizacao());
+            resultado.set(exame.getResultado());
+            observacao.set(exame.getObservacao());
+            nomePaciente.set(exame.getNomePaciente());
         }
     }
 
-    /**
-     * Cria um objeto Exame a partir dos valores atuais das Properties.
-     * Chamado antes de enviar os dados para o DAO (salvar ou atualizar).
-     * @return objeto Exame preenchido com os dados do formulário
-     */
+    // monta o objeto Exame com os valores atuais dos campos
     public Exame toEntity() {
-        Exame e = new Exame();
-        e.setId(id.get());
-        e.setTipo(tipo.get());
-        e.setDataRealizacao(dataRealizacao.get());
-        e.setResultado(resultado.get());
-        e.setObservacao(observacao.get());
-        e.setNomePaciente(nomePaciente.get());
-        return e;
+        Exame exame = new Exame();
+        exame.setId(id.get());
+        exame.setTipo(tipo.get());
+        exame.setDataRealizacao(dataRealizacao.get());
+        exame.setResultado(resultado.get());
+        exame.setObservacao(observacao.get());
+        exame.setNomePaciente(nomePaciente.get());
+        return exame;
     }
 
-    /**
-     * Reseta todas as Properties para os valores padrão.
-     * Chamado após salvar ou quando o usuário clica em "Novo".
-     */
+    // limpa o formulario pra cadastrar um novo
     public void limparCampos() {
         id.set(0);
         tipo.set("");
@@ -94,73 +71,52 @@ public class ExameControl {
         nomePaciente.set("");
     }
 
-    /**
-     * Valida os campos obrigatórios antes de salvar.
-     * Retorna uma mensagem de erro, ou string vazia se tudo estiver ok.
-     * Assim a Boundary pode exibir o Alert com a mensagem correta por campo.
-     */
+    // valida os campos obrigatorios - retorna mensagem do campo com erro
     public String validar() {
         if (tipo.get().isBlank())
-            return "O campo 'Tipo' é obrigatório.";
+            return "Preencha o campo Tipo";
         if (nomePaciente.get().isBlank())
-            return "O campo 'Nome do Paciente' é obrigatório.";
+            return "Preencha o campo 'Nome do Paciente'";
         if (resultado.get().isBlank())
-            return "O campo 'Resultado' é obrigatório.";
-        return ""; // sem erros
+            return "Preencha o campo 'Resultado'";
+        return "";
     }
 
-    /**
-     * Salva ou atualiza um exame no banco.
-     * Se o ID for 0, é um novo registro (INSERT); caso contrário, é edição (UPDATE).
-     * Após salvar, limpa o formulário e recarrega a lista.
-     */
+    // salva ou atualiza dependendo se ja tem id
     public void salvar() {
-        Exame e = toEntity();
+        Exame exame = toEntity();
         if (id.get() > 0) {
             // ID preenchido = registro já existe → atualiza
-            dao.atualizar(id.get(), e);
+            dao.atualizar(id.get(), exame);
         } else {
             // ID zerado = novo registro → cadastra
-            dao.cadastrar(e);
+            dao.cadastrar(exame);
         }
         limparCampos();
         carregar();
     }
 
-    /**
-     * Recarrega a lista com todos os exames do banco.
-     * Chamado no construtor e após qualquer operação de escrita.
-     */
+    // recarrega a lista do banco
     public void carregar() {
         lista.clear();
-        // Passando "" traz todos os registros (LIKE '%')
         lista.addAll(dao.pesquisarPorTipo(""));
     }
 
-    /**
-     * Remove o exame na posição informada da lista.
-     * O índice vem da linha selecionada no TableView.
-     * @param indice posição do exame na ObservableList
-     */
+    // apaga o exame da linha selecionada na tabela
     public void apagar(int indice) {
-        Exame e = lista.get(indice);
-        dao.apagar(e);
+        Exame exame = lista.get(indice);
+        dao.apagar(exame);
         carregar();
     }
 
-    /**
-     * Filtra a lista pelo tipo digitado no campo de pesquisa.
-     */
+    // filtra a tabela pelo tipo digitado
     public void pesquisar() {
         lista.clear();
         lista.addAll(dao.pesquisarPorTipo(getTipo()));
     }
 
-    // --- Getters de valor e de Property ---
-    // O getter de valor (ex: getTipo()) é usado em lógicas internas.
-    // O getter de Property (ex: tipoProperty()) é usado pelo binding na Boundary.
-
     public String getTipo() { return tipo.get(); }
+    
     public StringProperty tipoProperty() { return tipo; }
 
     public ObjectProperty<LocalDate> dataRealizacaoProperty() { return dataRealizacao; }
