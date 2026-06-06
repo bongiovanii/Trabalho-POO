@@ -2,23 +2,27 @@ package edu.fatec.paciente.view;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 
 import edu.fatec.paciente.controls.PacienteControl;
 import edu.fatec.paciente.model.Paciente;
-import javafx.application.Application;
-import javafx.scene.Scene;
+import javafx.beans.property.ReadOnlyStringWrapper;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
-import javafx.scene.layout.HBox;
-import javafx.geometry.Pos;
-import javafx.stage.Stage;
+import javafx.scene.layout.Pane;
+import javafx.scene.control.TableCell;
+import javafx.util.Callback;
 
-public class PacienteBoundary extends Application {
+public class PacienteBoundary {
     private PacienteControl control = new PacienteControl();
     private TextField id = new TextField();
     private TextField nome = new TextField();
@@ -26,246 +30,176 @@ public class PacienteBoundary extends Application {
     private TextField telefone = new TextField();
     private TextField email = new TextField();
     private TextField endereco = new TextField();
-    private TextField dataNascimento = new TextField();
+    private DatePicker dataNascimento = new DatePicker(LocalDate.now());
     private TextField peso = new TextField();
     private TextField altura = new TextField();
 
-
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    private Paciente pacienteCarregado = null;
-    private Long proximoId = 1L;
 
-    public Paciente toEntity() {
-        Paciente p = new Paciente();
-        p.setNome(nome.getText());
-        p.setCpf(cpf.getText());
-        p.setTelefone(telefone.getText());
-        p.setEmail(email.getText());
-        p.setEndereco(endereco.getText());
-        LocalDate data = LocalDate.parse(dataNascimento.getText(), dtf);
-        p.setDataNascimento(data);
-        p.setPeso(Double.parseDouble(peso.getText()));
-        p.setAltura(Double.parseDouble(altura.getText()));
-        control.salvar(p);
-        return p;
-    }
+    private TableView<Paciente> table = new TableView<>();
 
-    public void salvarOuAtualizar() {
-        Paciente p = new Paciente();
-        p.setNome(nome.getText());
-        p.setCpf(cpf.getText());
-        p.setTelefone(telefone.getText());
-        p.setEmail(email.getText());
-        p.setEndereco(endereco.getText());
-        LocalDate data = LocalDate.parse(dataNascimento.getText(), dtf);
-        p.setDataNascimento(data);
-        p.setPeso(Double.parseDouble(peso.getText()));
-        p.setAltura(Double.parseDouble(altura.getText()));
-        
-        if (pacienteCarregado != null) {
-            // Edição de paciente existente
-            Long idEditado = Long.parseLong(id.getText());
-            p.setId(idEditado);
-            control.atualizar(p);
-            pacienteCarregado = p;
-        } else {
-            // Novo paciente - usar o ID exibido no campo
-            Long idNovoRegistro = Long.parseLong(id.getText());
-            p.setId(idNovoRegistro);
-            
-            // Incrementar proximoId para o próximo registro
-            proximoId = idNovoRegistro + 1;
-            
-            control.salvar(p);
-            pacienteCarregado = p;
-        }
-    }
+    // método que monta a interface gráfica e retorna o painel principal
+    public Pane render() {
 
-    public void toBoundary(Paciente p) {
-        if (p != null) {
-            pacienteCarregado = p;
+        // borderPane divide a tela em regiões: Top (formulário) e Center (tabela)
+        BorderPane painelPrincipal = new BorderPane();
 
-            id.setText(p.getId().toString());
-            nome.setText(p.getNome());
-            cpf.setText(p.getCpf());
-            telefone.setText(p.getTelefone());
-            email.setText(p.getEmail());
-            endereco.setText(p.getEndereco());
-            String strData = p.getDataNascimento().format(dtf);
-            dataNascimento.setText(strData);
-            peso.setText(p.getPeso().toString());
-            altura.setText(p.getAltura().toString());
-        }
-    }
+        // gridPane organiza os campos em linhas e colunas (label | campo)
+        GridPane painelCampos = new GridPane();
+        painelCampos.setHgap(10); // seta o alinhamento horizontal entre colunas
+        painelCampos.setVgap(8); // seta o alinhamento vertical entre linhas
 
-    public void limparCampos() {
-        id.setText(proximoId.toString());
-        nome.setText("");
-        cpf.setText("");
-        telefone.setText("");
-        email.setText("");
-        endereco.setText("");
-        dataNascimento.setText("");
-        peso.setText("");
-        altura.setText("");
-        pacienteCarregado = null;
-    }
+        // Adição dos campos ao GridPane por (coluna, linha)
+        painelCampos.add(new Label("ID:"), 0, 0);
+        painelCampos.add(id, 1, 0);
 
-    @Override
-    public void start(Stage primaryStage) throws Exception {
-    
-        VBox mainContainer = new VBox();
-        mainContainer.setId("mainContainer");
-        mainContainer.setAlignment(Pos.TOP_CENTER);
+        painelCampos.add(new Label("Nome:"), 0, 1);
+        painelCampos.add(nome, 1, 1);
 
+        painelCampos.add(new Label("CPF:"), 0, 2);
+        painelCampos.add(cpf, 1, 2);
 
-        Label title = new Label("CADASTRO DE PACIENTES");
-        title.setId("formTitle");
+        painelCampos.add(new Label("Telefone:"), 0, 3);
+        painelCampos.add(telefone, 1, 3);
 
-      
-        GridPane grid = new GridPane();
-        grid.setId("formGrid");
-        grid.setHgap(15);
-        grid.setVgap(15);
+        painelCampos.add(new Label("Email:"), 0, 4);
+        painelCampos.add(email, 1, 4);
 
-        Label lblId = new Label("ID");
-        Label lblNome = new Label("Nome");
-        Label lblCpf = new Label("CPF");
-        Label lblTelefone = new Label("Telefone");
-        Label lblEmail = new Label("Email");
-        Label lblEndereco = new Label("Endereço");
-        Label lblDataNascimento = new Label("Data de Nascimento");
-        Label lblPeso = new Label("Peso (kg)");
-        Label lblAltura = new Label("Altura (m)");
+        painelCampos.add(new Label("Endereço:"), 0, 5);
+        painelCampos.add(endereco, 1, 5);
 
-        id.setPromptText("Preenchido automaticamente");
-        nome.setPromptText("Digite o nome completo");
-        cpf.setPromptText("000.000.000-00");
-        telefone.setPromptText("(00) 00000-0000");
-        email.setPromptText("email@exemplo.com");
-        endereco.setPromptText("Rua, número, cidade");
-        dataNascimento.setPromptText("dd/MM/yyyy");
-        peso.setPromptText("0.00");
-        altura.setPromptText("0.00");
+        painelCampos.add(new Label("Data de Nascimento:"), 0, 6);
+        painelCampos.add(dataNascimento, 1, 6);
 
+        painelCampos.add(new Label("Peso:"), 0, 7);
+        painelCampos.add(peso, 1, 7);
+
+        painelCampos.add(new Label("Altura:"), 0, 8);
+        painelCampos.add(altura, 1, 8);
+
+        // Botões e ações de clique Salvar, Pesquisar e Excluir
         Button btnSalvar = new Button("Salvar");
-        btnSalvar.setId("btnSalvar");
-        btnSalvar.setOnAction((e) -> {
-            try {
-                boolean isEdicao = pacienteCarregado != null;
-                salvarOuAtualizar();
-                if (isEdicao) {
-                    new Alert(AlertType.INFORMATION, "Paciente editado com Sucesso!").show();
-                } else {
-                    new Alert(AlertType.INFORMATION, "Paciente adicionado com sucesso!").show();
-                }
-                limparCampos();
-            } catch (Exception ex) {
-                new Alert(AlertType.ERROR, "Erro ao salvar paciente: " + ex.getMessage()).show();
-            }
-        });
-
         Button btnPesquisar = new Button("Pesquisar");
-        btnPesquisar.setId("btnPesquisar");
-        btnPesquisar.setOnAction((e) -> {
-            try {
-                Paciente p = null;
-                
-                // Tentar pesquisar por ID primeiro
-                if (!id.getText().isEmpty()) {
-                    try {
-                        Long idPesquisa = Long.parseLong(id.getText());
-                        p = control.pesquisarPorId(idPesquisa);
-                        if (p != null) {
-                            toBoundary(p);
-                            new Alert(AlertType.INFORMATION, "Paciente encontrado com sucesso!").show();
-                            return;
-                        }
-                    } catch (NumberFormatException ex) {
-                        new Alert(AlertType.WARNING, "ID deve ser um número válido").show();
-                        return;
-                    }
-                }
-                
-                // Se não achou por ID, pesquisar por nome
-                String nomePesquisa = nome.getText();
-                if (nomePesquisa.isEmpty()) {
-                    new Alert(AlertType.WARNING, "Digite o ID ou o nome do paciente para pesquisar").show();
-                    return;
-                }
-                
-                p = control.pesquisar(nomePesquisa);
-                if (p != null) {
-                    toBoundary(p);
-                    new Alert(AlertType.INFORMATION, "Paciente encontrado com sucesso!").show();
-                } else {
-                    new Alert(AlertType.WARNING, "Nenhum paciente encontrado").show();
-                }
-            } catch (Exception ex) {
-                new Alert(AlertType.ERROR, "Erro ao pesquisar: " + ex.getMessage()).show();
-            }
-        });
-
         Button btnExcluir = new Button("Excluir");
-        btnExcluir.setId("btnExcluir");
-        btnExcluir.setStyle("-fx-background-color: #ff4444; -fx-text-fill: white; -fx-font-weight: bold;");
-        btnExcluir.setOnAction((e) -> {
-            try {
-                if (pacienteCarregado != null) {
-                    control.deletar(pacienteCarregado);
-                    new Alert(AlertType.INFORMATION, "Paciente excluído com Sucesso!").show();
-                    limparCampos();
-                } else {
-                    new Alert(AlertType.WARNING, "Nenhum paciente carregado para deletar").show();
-                }
-            } catch (Exception ex) {
-                new Alert(AlertType.ERROR, "Erro ao excluir paciente: " + ex.getMessage()).show();
+        Button btnNovo = new Button("Novo");
+
+        // Adiciona botões ao painel de campos
+        painelCampos.add(btnNovo, 0, 9);
+        painelCampos.add(btnSalvar, 1, 9);
+        painelCampos.add(btnPesquisar, 2, 9);
+
+        // IMPORTANTE: Adicionar o painel de campos e a tabela ao painel principal
+        painelPrincipal.setTop(painelCampos);
+        painelPrincipal.setCenter(table);
+
+        // Bindings bidirecionais - campo e property ficam sincronizadas
+        javafx.beans.binding.Bindings.bindBidirectional(nome.textProperty(), control.nomeProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(cpf.textProperty(), control.cpfProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(telefone.textProperty(), control.telefoneProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(email.textProperty(), control.emailProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(endereco.textProperty(), control.enderecoProperty());
+
+        // Ação do botão Novo - limpa os campos
+        btnNovo.setOnAction((e) -> {
+            control.limparCampos();
+        });
+
+        btnSalvar.setOnAction(e -> {
+            String mensagemErro = control.validar();
+            if (!mensagemErro.isEmpty()) {
+                new Alert(AlertType.WARNING, mensagemErro).show();
+            } else {
+                control.salvar();
+                new Alert(AlertType.INFORMATION, "Paciente salvo com sucesso!").show();
             }
         });
 
-        // Preencher ID automaticamente com o próximo ID disponível do banco de dados
-        proximoId = control.obterProximoId();
-        id.setText(proximoId.toString());
-        grid.add(lblId, 0, 0);
-        grid.add(id, 1, 0);
-        grid.add(lblNome, 0, 1);
-        grid.add(nome, 1, 1);
-        grid.add(lblCpf, 0, 2);
-        grid.add(cpf, 1, 2);
-        grid.add(lblTelefone, 0, 3);
-        grid.add(telefone, 1, 3);
-        grid.add(lblEmail, 0, 4);
-        grid.add(email, 1, 4);
-        grid.add(lblEndereco, 0, 5);
-        grid.add(endereco, 1, 5);
-        grid.add(lblDataNascimento, 0, 6);
-        grid.add(dataNascimento, 1, 6);
-        grid.add(lblPeso, 0, 7);
-        grid.add(peso, 1, 7);
-        grid.add(lblAltura, 0, 8);
-        grid.add(altura, 1, 8);
+        btnPesquisar.setOnAction((e) -> control.pesquisar());
 
-     
-        HBox buttonBox = new HBox();
-        buttonBox.setId("buttonBox");
-        buttonBox.setPrefHeight(50);
-        buttonBox.setAlignment(Pos.CENTER);
-        buttonBox.getChildren().addAll(btnSalvar, btnPesquisar, btnExcluir);
-        grid.add(buttonBox, 0, 9);
-        GridPane.setColumnSpan(buttonBox, 2);
+        table.getSelectionModel().selectedItemProperty().addListener(
+                (obs, anterior, selecionado) -> control.fromEntity(selecionado));
 
-        // Adicionando elementos ao container principal
-        mainContainer.getChildren().addAll(title, grid);
+        // Criando as colunas da tabela
+        TableColumn<Paciente, String> colId = new TableColumn<>("ID");
+        colId.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getId().toString()));
 
-        // Cena e estilo
-        Scene scn = new Scene(mainContainer, 600, 650);
-        String resource = getClass().getResource("/styles.css").toExternalForm();
-        scn.getStylesheets().add(resource);
+        TableColumn<Paciente, String> colNome = new TableColumn<>("Nome");
+        colNome.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getNome()));
 
-        primaryStage.setScene(scn);
-        primaryStage.setTitle("Sistema de Gestão de Pacientes");
-        primaryStage.setResizable(true);
-        primaryStage.show();
+        TableColumn<Paciente, String> colCpf = new TableColumn<>("CPF");
+        colCpf.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getCpf()));
+
+        TableColumn<Paciente, String> colTelefone = new TableColumn<>("Telefone");
+        colTelefone.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getTelefone()));
+
+        TableColumn<Paciente, String> colEmail = new TableColumn<>("Email");
+        colEmail.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getEmail()));
+
+        TableColumn<Paciente, String> colEndereco = new TableColumn<>("Endereço");
+        colEndereco.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getEndereco()));
+
+        TableColumn<Paciente, String> colDataNascimento = new TableColumn<>("Data Nascimento");
+        colDataNascimento.setCellValueFactory(item -> {
+            LocalDate data = item.getValue().getDataNascimento();
+            String dataFormatada = data != null ? data.format(dtf) : "";
+            return new ReadOnlyStringWrapper(dataFormatada);
+        });
+
+        TableColumn<Paciente, String> colPeso = new TableColumn<>("Peso (kg)");
+        colPeso.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getPeso().toString()));
+
+        TableColumn<Paciente, String> colAltura = new TableColumn<>("Altura (m)");
+        colAltura.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getAltura().toString()));
+
+        TableColumn<Paciente, Void> colAcoes = new TableColumn<>("Ações");
+
+        // O callback define como cada célula da coluna de ações é renderizada
+        Callback<TableColumn<Paciente, Void>, TableCell<Paciente, Void>> callback = new Callback<>() {
+            public TableCell<Paciente, Void> call(TableColumn<Paciente, Void> column) {
+                return new TableCell<Paciente, Void>() {
+
+                    Button btnExcluir = new Button("Excluir");
+
+                    {
+                        btnExcluir.setOnAction(e -> {
+                            Alert alert = new Alert(
+                                    AlertType.CONFIRMATION,
+                                    "Deseja excluir este paciente?",
+                                    ButtonType.YES, ButtonType.NO);
+                            alert.setTitle("Confirmar exclusao");
+
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.YES) {
+                                control.excluir(getIndex());
+                            }
+                        });
+                    }
+
+                    // updateItem é chamado pelo JavaFX para renderizar cada célula
+                    @Override
+                    public void updateItem(Void param, boolean empty) {
+                        super.updateItem(param, empty);
+                        setGraphic(empty ? null : btnExcluir);
+                    }
+                };
+            }
+        };
+
+        colAcoes.setCellFactory(callback);
+
+        // Adicionando as colunas à tabela
+        table.getColumns().add(colId);
+        table.getColumns().add(colNome);
+        table.getColumns().add(colCpf);
+        table.getColumns().add(colTelefone);
+        table.getColumns().add(colEmail);
+        table.getColumns().add(colEndereco);
+        table.getColumns().add(colDataNascimento);
+        table.getColumns().add(colPeso);
+        table.getColumns().add(colAltura);
+        table.getColumns().add(colAcoes);
+
+        table.setItems(control.getLista());
+        return painelPrincipal;
     }
-
 }

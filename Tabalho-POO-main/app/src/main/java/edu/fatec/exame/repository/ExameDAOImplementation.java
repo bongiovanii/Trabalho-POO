@@ -14,22 +14,22 @@ import edu.fatec.exame.model.Exame;
 public class ExameDAOImplementation implements ExameDAO {
 
     private static final String DB_URI =
-        "jdbc:mariadb://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
+        "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
 
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "123456";
+    private static final String DB_PASS = "admin26";
 
     private Connection conexao;
 
     // abre a conexao com o banco assim que o objeto e criado
     public ExameDAOImplementation() {
         try {            
-            Class.forName("org.mariadb.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("Driver carregado...");
             conexao = DriverManager.getConnection(DB_URI, DB_USER, DB_PASS);
             System.out.println("Conectado ao banco de dados clinica...");
         } catch (ClassNotFoundException e) {
-            System.out.println("Erro: driver MariaDB não encontrado.");
+            System.out.println("Erro: driver MySQL não encontrado.");
             e.printStackTrace();
         } catch (SQLException e) {
             System.out.println("Erro ao conectar no banco de dados.");

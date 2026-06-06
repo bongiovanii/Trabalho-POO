@@ -4,7 +4,7 @@
 CREATE DATABASE IF NOT EXISTS clinica;
 USE clinica;
 
--- Criar tabela de pacientes
+-- Tabela de pacientes
 CREATE TABLE IF NOT EXISTS paciente (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
     nome VARCHAR(100) NOT NULL,
@@ -19,6 +19,20 @@ CREATE TABLE IF NOT EXISTS paciente (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_nome (nome),
     INDEX idx_cpf (cpf)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- Tabela de médicos
+CREATE TABLE IF NOT EXISTS medico(
+     id BIGINT AUTO_INCREMENT PRIMARY KEY, 
+     nome VARCHAR(100) NOT NULL,
+     cpf VARCHAR(11) UNIQUE NOT NULL,
+     crm VARCHAR(6) UNIQUE NOT NULL, 
+     telefone VARCHAR(11),
+     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+     INDEX idx_nome (nome),
+     INDEX idx_crm (crm)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- Tabela de exames médicos
