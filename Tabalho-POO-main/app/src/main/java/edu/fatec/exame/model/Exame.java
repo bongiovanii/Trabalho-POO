@@ -20,6 +20,7 @@ public class Exame {
     private String observacao = "";
 
     // nome do paciente que fez o exame
+    // Aqui tem que ser um paciente que esteja cadastrado no banco de dados, deve ser apenas uma seleção dos pacientes cadastrados
     private String nomePaciente = "";
 
     // --- Getters e Setters ---

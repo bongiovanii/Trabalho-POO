@@ -26,8 +26,8 @@ dependencies {
     // This dependency is used by the application.
     implementation(libs.guava)
 
-    // MySQL Connector
-    implementation("org.mariadb.jdbc:mariadb-java-client:3.3.3")
+    // MySQL Connector/J
+    implementation("com.mysql:mysql-connector-j:9.0.0")
 }
 
 // Apply a specific Java toolchain to ease working on different environments.
