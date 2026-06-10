@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -29,11 +30,11 @@ public class ConsultaBoundary {
     private ConsultaControl control = new ConsultaControl();
 
     // campos do formulario
-    private TextField txtNomeMedico   = new TextField();
+    private TextField txtNomeMedico = new TextField();
     private TextField txtNomePaciente = new TextField();
     private DatePicker dpDataConsulta = new DatePicker(LocalDate.now());
     private TextField txtDiagnostico  = new TextField();
-    private TextField txtStatus       = new TextField();
+    private ComboBox<String> cbStatus = new ComboBox<>();
 
     // tabela que exibe as consultas carregadas do banco
     private TableView<Consulta> tabela = new TableView<>();
@@ -59,8 +60,8 @@ public class ConsultaBoundary {
         painelCampos.add(new Label("Diagnóstico:"), 0, 3);
         painelCampos.add(txtDiagnostico,  1, 3);
 
-        painelCampos.add(new Label("Status:"), 0, 4);
-        painelCampos.add(txtStatus, 1, 4);
+        cbStatus.getItems().addAll("Agendada", "Realizada", "Cancelada");
+        painelCampos.add(cbStatus, 1, 4);
 
         Button btnSalvar = new Button("Salvar");
         Button btnNovo = new Button("Novo");
@@ -79,7 +80,7 @@ public class ConsultaBoundary {
         Bindings.bindBidirectional(txtNomeMedico.textProperty(), control.nomeMedicoProperty());
         Bindings.bindBidirectional(txtNomePaciente.textProperty(), control.nomePacienteProperty());
         Bindings.bindBidirectional(txtDiagnostico.textProperty(), control.diagnosticoProperty());
-        Bindings.bindBidirectional(txtStatus.textProperty(), control.statusProperty());
+        Bindings.bindBidirectional(cbStatus.valueProperty(), control.statusProperty());
         Bindings.bindBidirectional(dpDataConsulta.valueProperty(), control.dataConsultaProperty());
 
         // botao salvar valida antes de gravar

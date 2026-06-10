@@ -58,14 +58,36 @@ public class ConsultaControl {
         }
     }
 
-    // valida os campos obrigatorios - retorna mensagem do campo com erro
+    // valida os campos obrigatorios e regras de negocio
     public String validar() {
-        if (nomePaciente.get().isBlank())
+        if (nomePaciente.get().isBlank()){
             return "Preencha o campo Nome do Paciente.";
-        if (nomeMedico.get().isBlank())
+        }
+            
+        if (nomePaciente.get().length() < 3){
+            return "Nome do Paciente deve ter ao menos 3 caracteres.";
+        }
+
+        if (nomeMedico.get().isBlank()){
             return "Preencha o campo Nome do Médico.";
-        if (status.get().isBlank())
-            return "Preencha o campo Status (ex: Agendada, Realizada, Cancelada).";
+        }
+            
+        if (nomeMedico.get().length() < 3){
+            return "Nome do Médico deve ter ao menos 3 caracteres.";
+        }
+            
+        if (dataConsulta.get() == null){
+            return "Preencha a Data da Consulta.";
+        }
+            
+        if (dataConsulta.get().isBefore(LocalDate.of(1900, 1, 1))){
+            return "Data da Consulta inválida.";
+        }
+            
+        if (status.get() == null || status.get().isBlank()){
+            return "Selecione o Status da Consulta.";
+        }
+            
         return "";
     }
 

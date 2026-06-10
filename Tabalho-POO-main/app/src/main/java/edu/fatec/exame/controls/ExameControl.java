@@ -73,12 +73,38 @@ public class ExameControl {
 
     // valida os campos obrigatorios - retorna mensagem do campo com erro
     public String validar() {
-        if (tipo.get().isBlank())
-            return "Preencha o campo Tipo";
-        if (nomePaciente.get().isBlank())
-            return "Preencha o campo 'Nome do Paciente'";
-        if (resultado.get().isBlank())
-            return "Preencha o campo 'Resultado'";
+        if (tipo.get().isBlank()){
+            return "Preencha o campo Tipo do Exame.";
+        }
+            
+        if (tipo.get().length() < 3){
+            return "Tipo do Exame deve ter ao menos 3 caracteres.";
+        }
+            
+        if (dataRealizacao.get() == null){
+            return "Preencha a Data de Realização.";
+        }
+            
+        if (dataRealizacao.get().isAfter(LocalDate.now())){
+            return "A data de realização não pode ser no futuro.";
+        }
+            
+        if (resultado.get().isBlank()){
+            return "Preencha o campo Resultado.";
+        }
+            
+        if (resultado.get().length() < 3){
+            return "Resultado deve ter ao menos 3 caracteres.";
+        }
+            
+        if (nomePaciente.get().isBlank()){
+            return "Preencha o campo Nome do Paciente.";
+        }
+            
+        if (nomePaciente.get().length() < 3){
+            return "Nome do Paciente deve ter ao menos 3 caracteres.";
+        }
+            
         return "";
     }
 
