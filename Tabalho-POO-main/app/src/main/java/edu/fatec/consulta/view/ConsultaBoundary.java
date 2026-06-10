@@ -61,6 +61,7 @@ public class ConsultaBoundary {
         painelCampos.add(txtDiagnostico,  1, 3);
 
         cbStatus.getItems().addAll("Agendada", "Realizada", "Cancelada");
+        painelCampos.add(new Label("Status:"), 0, 4);
         painelCampos.add(cbStatus, 1, 4);
 
         Button btnSalvar = new Button("Salvar");

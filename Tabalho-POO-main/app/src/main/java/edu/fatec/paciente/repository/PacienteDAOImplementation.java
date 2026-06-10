@@ -57,7 +57,11 @@ public class PacienteDAOImplementation implements PacienteDAO {
             stmt.setString(4, p.getTelefone());
             stmt.setString(5, p.getEmail());
             stmt.setString(6, p.getEndereco());
-            stmt.setDate(7, Date.valueOf(p.getDataNascimento()));
+            if (p.getDataNascimento() != null) {
+                stmt.setDate(7, Date.valueOf(p.getDataNascimento()));
+            } else {
+                stmt.setNull(7, java.sql.Types.DATE);
+            }
             stmt.setDouble(8, p.getPeso());
             stmt.setDouble(9, p.getAltura());
 
@@ -79,7 +83,11 @@ public class PacienteDAOImplementation implements PacienteDAO {
             stmt.setString(3, p.getTelefone());
             stmt.setString(4, p.getEmail());
             stmt.setString(5, p.getEndereco());
-            stmt.setDate(6, Date.valueOf(p.getDataNascimento()));
+            if (p.getDataNascimento() != null) {
+                stmt.setDate(6, Date.valueOf(p.getDataNascimento()));
+            } else {
+                stmt.setNull(6, java.sql.Types.DATE);
+            }
             stmt.setDouble(7, p.getPeso());
             stmt.setDouble(8, p.getAltura());
             stmt.setLong(9, id);

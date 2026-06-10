@@ -23,27 +23,19 @@ import edu.fatec.medico.model.Medico;
 public class MedicoBoundary{
     private MedicoController controller = new MedicoController();
 
-    // Criando os TextFields para os atributos do médico
     private TextField nome = new TextField();
     private TextField crm = new TextField();
     private TextField cpf = new TextField();
     private TextField especialidade = new TextField();
     private TextField telefone = new TextField();
 
-    // Criando o table view para exibir os médicos cadastrados
     private TableView<Medico> table = new TableView<>();
 
     public Pane render() {
-        // Aqui você é na onde a gnt carrega toda a interface gráfica, adicionando os TextFields e a TableView
-        // e também configurando os bindings entre os campos e o controller
-        
-        // borderPane divide a tela em regiões: Top (formulário) e Center (tabela) vai ser mais facil pra pode editar o layout do sistema
         BorderPane painelPrincipal = new BorderPane();
-        GridPane painelCampos = new GridPane(); // Criadmos um painel do tipo grid pra facilitar o alinhamento dos campos do formulário
-        painelCampos.setHgap(10); // seta o alinhamento horizontal entre colunas
-        painelCampos.setVgap(8); // seta o alinhamento vertical entre linhas
-
-        // Adição dos campos ao GridPane por (coluna, linha)
+        GridPane painelCampos = new GridPane(); 
+        painelCampos.setHgap(10); 
+        painelCampos.setVgap(8); 
 
         painelCampos.add(new Label("Nome: "), 0,1);
         painelCampos.add(nome, 1,1);
@@ -60,25 +52,18 @@ public class MedicoBoundary{
         painelCampos.add(new Label("Telefone: "), 0,5);
         painelCampos.add(telefone, 1,5);
 
-        // Criação dos botões de ação (Salvar, Excluir, etc)
-
         Button btnSalvar = new Button("Salvar");
         Button btnExcluir = new Button("Excluir");
         Button btnPesquisar = new Button("Pesquisar");
         Button btnNovo = new Button("Novo");
 
-        // adição dos botões no painel campos que vai ser carregado depois
         painelCampos.add(btnNovo,0,6);
         painelCampos.add(btnSalvar, 1, 6);
         painelCampos.add(btnPesquisar, 2 , 6);
         painelCampos.add(btnExcluir, 3, 6);
 
-        // adição do painel campo ao painel principal e a table
         painelPrincipal.setTop(painelCampos);
         painelPrincipal.setCenter(table);
-
-        // biding direcional para os campos do formulário se comunicarem com as properties do controller, ou seja, quando eu digitar algo no campo nome, o valor da property nome do controller vai ser atualizado automaticamente e vice versa, e para isso está chamando uma função do meu controller para retornar a property declarada lá
-    
 
         javafx.beans.binding.Bindings.bindBidirectional(nome.textProperty(), controller.nomeProperty());
         javafx.beans.binding.Bindings.bindBidirectional(crm.textProperty(), controller.crmProperty(), new NumberStringConverter());
@@ -86,15 +71,13 @@ public class MedicoBoundary{
         javafx.beans.binding.Bindings.bindBidirectional(especialidade.textProperty(), controller.especialidadeProperty());
         javafx.beans.binding.Bindings.bindBidirectional(telefone.textProperty(), controller.telefoneProperty());
 
-        // Botão novo limpa os campos
         btnNovo.setOnAction(e ->{
             controller.limparCampos();
         });
 
-        // Botão salvar salva o medico
         btnSalvar.setOnAction(e -> {
             String error = controller.validar();
-            if(error.isEmpty()){
+            if(!error.isEmpty()){
                 new Alert(AlertType.WARNING, error).show();
             } else{
                 controller.salvar();
@@ -106,29 +89,26 @@ public class MedicoBoundary{
             controller.pesquisar();
         });
 
-        // toda vez que selecionar um item da tabela vai subir as informações dentro do formulário
-
         table.getSelectionModel().selectedItemProperty().addListener(
             (obs, anterior, selecionado) -> controller.fromEntity(selecionado)
         );
 
-
-        TableColumn<Medico, String> colId = new TableColumn<>("ID: ");
+        TableColumn<Medico, String> colId = new TableColumn<>("ID");
         colId.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getId().toString()));
 
-        TableColumn<Medico, String> colNome = new TableColumn<>("Nome: ");
+        TableColumn<Medico, String> colNome = new TableColumn<>("Nome");
         colNome.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getNome()));
 
-        TableColumn<Medico, String> colCrm = new TableColumn<>("CRM: ");
+        TableColumn<Medico, String> colCrm = new TableColumn<>("CRM");
         colCrm.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getCrm().toString()));
 
-        TableColumn<Medico, String> colCpf = new TableColumn<>("CPF: ");
+        TableColumn<Medico, String> colCpf = new TableColumn<>("CPF");
         colCpf.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getCpf().toString()));
 
-        TableColumn<Medico, String> colEspecilidade = new TableColumn<>("Especialidade: ");
+        TableColumn<Medico, String> colEspecilidade = new TableColumn<>("Especialidade");
         colEspecilidade.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getEspecialidade()));
 
-        TableColumn<Medico, String> colTel = new TableColumn<>("Telefone: ");
+        TableColumn<Medico, String> colTel = new TableColumn<>("Telefone");
         colTel.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getTelefone()));
 
         TableColumn<Medico, Void> colAcoes = new TableColumn<>("Ações");
@@ -137,10 +117,10 @@ public class MedicoBoundary{
             @Override
             public TableCell<Medico, Void> call(TableColumn<Medico, Void> column) {
                 return new TableCell<>() {
-                    private final Button btnExcluir = new Button("Excluir");
+                    private final Button btnExcluirCol = new Button("Excluir");
 
                     {
-                        btnExcluir.setOnAction(e -> {
+                        btnExcluirCol.setOnAction(e -> {
                             Medico medico = getTableView().getItems().get(getIndex());
                             Alert alert = new Alert(
                                     AlertType.CONFIRMATION,
@@ -159,7 +139,7 @@ public class MedicoBoundary{
                     @Override
                     protected void updateItem(Void item, boolean empty) {
                         super.updateItem(item, empty);
-                        setGraphic(empty ? null : btnExcluir);
+                        setGraphic(empty ? null : btnExcluirCol);
                     }
                 };
             }
@@ -172,10 +152,4 @@ public class MedicoBoundary{
 
         return painelPrincipal;
     }
-  
-
-    
-    
 }
-
-

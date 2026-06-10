@@ -32,6 +32,11 @@ public class MedicoController {
 
     private MedicoDAO dao =  new MedicoDAOImplementation();
 
+    // O construtor agora chama o carregar() para que a lista de médicos apareça assim que a tela abrir
+    public MedicoController() {
+        carregar();
+    }
+
     public void limparCampos(){
         id.set(0);
         nome.set("");
@@ -45,12 +50,17 @@ public class MedicoController {
         if (nome.get().isBlank()){
             return "O campo nome é obrigatório";
         }
-        if (crm.get() <= 0){
-            return "O campo CRM é obrigatório e deve ser maior que zero";
+        
+        String sCrm = String.valueOf(crm.get());
+        if (crm.get() <= 0 || sCrm.length() < 4 || sCrm.length() > 10) {
+            return "O campo CRM deve ter entre 4 e 10 digitos";
         }
-        if (cpf.get() <= 0){
-            return "O campo CPF é obrigatório e deve ser maior que zero";
+
+        String sCpf = String.valueOf(cpf.get());
+        if (cpf.get() <= 0 || sCpf.length() != 11) {
+            return "O campo CPF deve ter exatamente 11 digitos numericos";
         }
+
         if (especialidade.get().isBlank()){
             return "O campo especialidade é obrigatório";
         }
@@ -104,7 +114,8 @@ public class MedicoController {
         return nome.get();
     }
 
-    private void carregar() {
+    // Deixei público para poder ser chamado se necessário, e agora limpa e recarrega todos os médicos
+    public void carregar() {
         lista.clear();
         lista.addAll(dao.pesquisarPorNome(""));
     }
@@ -116,6 +127,4 @@ public class MedicoController {
         carregar();
     }
 
-    
-    
 }
