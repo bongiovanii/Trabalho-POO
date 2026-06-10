@@ -94,11 +94,16 @@ public class PacienteBoundary {
         painelPrincipal.setCenter(table);
 
         // Bindings bidirecionais - campo e property ficam sincronizadas
+        id.setEditable(false);
+        javafx.beans.binding.Bindings.bindBidirectional(id.textProperty(), control.idProperty(), new javafx.util.converter.NumberStringConverter());
         javafx.beans.binding.Bindings.bindBidirectional(nome.textProperty(), control.nomeProperty());
         javafx.beans.binding.Bindings.bindBidirectional(cpf.textProperty(), control.cpfProperty());
         javafx.beans.binding.Bindings.bindBidirectional(telefone.textProperty(), control.telefoneProperty());
         javafx.beans.binding.Bindings.bindBidirectional(email.textProperty(), control.emailProperty());
         javafx.beans.binding.Bindings.bindBidirectional(endereco.textProperty(), control.enderecoProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(dataNascimento.valueProperty(), control.dataNascimentoProperty());
+        javafx.beans.binding.Bindings.bindBidirectional(peso.textProperty(), control.pesoProperty().asObject(), new javafx.util.converter.DoubleStringConverter());
+        javafx.beans.binding.Bindings.bindBidirectional(altura.textProperty(), control.alturaProperty().asObject(), new javafx.util.converter.DoubleStringConverter());
 
         // Ação do botão Novo - limpa os campos
         btnNovo.setOnAction((e) -> {
@@ -136,6 +141,7 @@ public class PacienteBoundary {
         TableColumn<Paciente, String> colEmail = new TableColumn<>("Email");
         colEmail.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getEmail()));
 
+        // Eu arrumei o nome da coluna aqui para Endereço para usar a acentuação correta
         TableColumn<Paciente, String> colEndereco = new TableColumn<>("Endereço");
         colEndereco.setCellValueFactory(item -> new ReadOnlyStringWrapper(item.getValue().getEndereco()));
 
@@ -167,7 +173,8 @@ public class PacienteBoundary {
                                     AlertType.CONFIRMATION,
                                     "Deseja excluir este paciente?",
                                     ButtonType.YES, ButtonType.NO);
-                            alert.setTitle("Confirmar exclusao");
+                            // Eu corrigi o título do alerta aqui para o português correto com acento
+                            alert.setTitle("Confirmar exclusão");
 
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.YES) {

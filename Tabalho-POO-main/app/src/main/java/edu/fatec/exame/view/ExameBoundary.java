@@ -53,7 +53,7 @@ public class ExameBoundary {
         painelCampos.add(new Label("Tipo do Exame:"), 0, 0);
         painelCampos.add(txtTipo, 1, 0);
 
-        painelCampos.add(new Label("Data de Realizacao:"), 0, 1);
+        painelCampos.add(new Label("Data de Realização:"), 0, 1);
         painelCampos.add(dpDataRealizacao, 1, 1);
 
         painelCampos.add(new Label("Resultado:"), 0, 2);
@@ -148,7 +148,8 @@ public class ExameBoundary {
                                     "Deseja apagar este exame?",
                                     ButtonType.YES, ButtonType.NO
                                 );
-                                alert.setTitle("Confirmar exclusao");
+                                // Eu corrigi o título aqui também para o português correto com acento
+                                alert.setTitle("Confirmar exclusão");
 
                                 Optional<ButtonType> result = alert.showAndWait();
                                 if (result.isPresent() && result.get() == ButtonType.YES) {

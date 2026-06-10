@@ -10,21 +10,21 @@ import java.util.List;
 
 import edu.fatec.consulta.model.Consulta;
 
-// Implementacao do DAO usando JDBC com MariaDB
+// Implementacao do DAO usando JDBC com MySQL
 public class ConsultaDAOImplementation implements ConsultaDAO {
 
     private static final String URL_BANCO =
-        "jdbc:mariadb://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
+        "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
 
     private static final String USUARIO = "root";
-    private static final String SENHA = "123456";
+    private static final String SENHA = "admin26";
 
     private Connection conexao;
 
     // abre conexao com o banco ao criar o objeto
     public ConsultaDAOImplementation() {
         try {
-            Class.forName("org.mariadb.jdbc.Driver");
+            Class.forName("com.mysql.cj.jdbc.Driver");
             System.out.println("Driver carregado");
             conexao = DriverManager.getConnection(URL_BANCO, USUARIO, SENHA);
             System.out.println("Conectado ao banco clinica");

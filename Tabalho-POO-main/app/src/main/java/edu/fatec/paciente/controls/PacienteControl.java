@@ -31,7 +31,7 @@ public class PacienteControl {
     private StringProperty telefone = new SimpleStringProperty("");
     private StringProperty email = new SimpleStringProperty("");
     private StringProperty endereco = new SimpleStringProperty("");
-    private ObjectProperty<LocalDate> dataNascimento = new SimpleObjectProperty<>(LocalDate.of(1900, 1, 1));
+    private ObjectProperty<LocalDate> dataNascimento = new SimpleObjectProperty<>(LocalDate.now());
     private DoubleProperty peso = new SimpleDoubleProperty(0.0);
     private DoubleProperty altura = new SimpleDoubleProperty(0.0);
 
@@ -96,8 +96,15 @@ public class PacienteControl {
         if (nome.get().isBlank()) {
             return "Preencha o campo Nome";
         }
-        if (cpf.get().isBlank()) {
-            return "Preencha o campo CPF";
+        
+        // Eu coloquei essa parte porque o CPF do paciente tem que ter 11 números certinhos, senão dá erro no sistema
+        String sCpf = cpf.get().replaceAll("[^0-9]", ""); // limpa para deixar só números
+        if (sCpf.isBlank() || sCpf.length() != 11) {
+            return "O CPF deve conter exatamente 11 digitos numericos";
+        }
+
+        if (dataNascimento.get() == null) {
+            return "O campo Data de Nascimento é obrigatório";
         }
         return "";
     }
@@ -136,6 +143,7 @@ public class PacienteControl {
 
 
     public ObservableList<Paciente> getLista() { return lista; }
+    public LongProperty idProperty(){ return id;}
     public StringProperty nomeProperty() { return nome; }
     public StringProperty cpfProperty() { return cpf; }
     public StringProperty telefoneProperty() { return telefone; }
