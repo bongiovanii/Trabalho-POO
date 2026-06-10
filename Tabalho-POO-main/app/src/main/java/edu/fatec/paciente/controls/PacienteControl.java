@@ -93,10 +93,12 @@ public class PacienteControl {
 
     // valida os campos obrigatorios - retorna mensagem do campo com erro
     public String validar() {
-        if (nome.get().isBlank())
+        if (nome.get().isBlank()) {
             return "Preencha o campo Nome";
-        if (cpf.get().isBlank())
+        }
+        if (cpf.get().isBlank()) {
             return "Preencha o campo CPF";
+        }
         return "";
     }
 
@@ -124,7 +126,7 @@ public class PacienteControl {
     }
 
 
-    // filtra a tabela pelo tipo digitado
+    // filtra a tabela pelo nome digitado
     public void pesquisar() {
         lista.clear();
         lista.addAll(dao.pesquisarPorNome(getNome()));

@@ -87,6 +87,7 @@ public class PacienteBoundary {
         painelCampos.add(btnNovo, 0, 9);
         painelCampos.add(btnSalvar, 1, 9);
         painelCampos.add(btnPesquisar, 2, 9);
+        painelCampos.add(btnExcluir, 3, 9);
 
         // IMPORTANTE: Adicionar o painel de campos e a tabela ao painel principal
         painelPrincipal.setTop(painelCampos);

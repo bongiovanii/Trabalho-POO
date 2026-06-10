@@ -1,6 +1,7 @@
 package edu.fatec;
 
 import edu.fatec.exame.view.ExameBoundary;
+import edu.fatec.medico.view.MedicoBoundary;
 import edu.fatec.paciente.view.PacienteBoundary;
 import javafx.application.Application;
 import javafx.scene.Scene;
@@ -14,6 +15,7 @@ import javafx.stage.Stage;
 public class PrincipalBoundary extends Application {
     private BorderPane pane = new BorderPane();
     private Pane pacientePane;
+    private Pane medicoPane;
     private Pane examePane;
    
 
@@ -42,10 +44,17 @@ public class PrincipalBoundary extends Application {
 
         pane.setTop( menuBar );
 
+        // Configura os eventos dos itens do menu para carregar os painéis correspondentes
 
         mnuPacienteItem.setOnAction( e -> {
             carregarPacientePane();
             pane.setCenter( pacientePane );
+        });
+
+        
+        mnuMedicoItem.setOnAction( e -> {
+            carregarMedicoPane();
+            pane.setCenter( medicoPane );
         });
         
         mnuExameItem.setOnAction( e -> {
@@ -59,7 +68,7 @@ public class PrincipalBoundary extends Application {
     }
     
     /**
-     * Carrega o painel de Pacientes de forma segura
+     * Carrega o painel de Pacientes 
      */
     private void carregarPacientePane() {
         if (pacientePane == null) {
@@ -69,17 +78,29 @@ public class PrincipalBoundary extends Application {
             } catch (Exception e) {
                 System.out.println("Erro ao carregar painel de Pacientes:");
                 e.printStackTrace();
-                // Cria um painel vazio em caso de erro
-                pacientePane = new javafx.scene.layout.VBox();
-                javafx.scene.control.Label lblErro = new javafx.scene.control.Label(
-                    "Erro ao carregar painel de Pacientes. Verifique a conexão com o banco de dados.");
-                ((javafx.scene.layout.VBox) pacientePane).getChildren().add(lblErro);
+            }
+        }
+    }
+
+
+      /**
+     * Carrega o painel de Pacientes 
+     */
+    private void carregarMedicoPane() {
+        if (medicoPane == null) {
+            try {
+                medicoPane = new MedicoBoundary().render();
+                System.out.println("Painel de Médicos carregado com sucesso.");
+            } catch (Exception e) {
+                System.out.println("Erro ao carregar painel de Médicos:");
+                e.printStackTrace();
             }
         }
     }
     
+    
     /**
-     * Carrega o painel de Exames de forma segura
+     * Carrega o painel de Exames 
      */
     private void carregarExamePane() {
         if (examePane == null) {
@@ -89,11 +110,6 @@ public class PrincipalBoundary extends Application {
             } catch (Exception e) {
                 System.out.println("Erro ao carregar painel de Exames:");
                 e.printStackTrace();
-                // Cria um painel vazio em caso de erro
-                examePane = new javafx.scene.layout.VBox();
-                javafx.scene.control.Label lblErro = new javafx.scene.control.Label(
-                    "Erro ao carregar painel de Exames. Verifique a conexão com o banco de dados.");
-                ((javafx.scene.layout.VBox) examePane).getChildren().add(lblErro);
             }
         }
     }
