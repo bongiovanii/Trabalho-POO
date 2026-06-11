@@ -12,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -30,7 +31,8 @@ public class ExameBoundary {
     private DatePicker dpDataRealizacao = new DatePicker(LocalDate.now());
     private TextField txtResultado = new TextField();
     private TextField txtObservacao = new TextField();
-    private TextField txtNomePaciente = new TextField();
+    private ComboBox<String> cbNomePaciente = new ComboBox<>();
+    private ComboBox<String> cbStatus = new ComboBox<>();
 
     private DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -50,29 +52,34 @@ public class ExameBoundary {
         painelCampos.setVgap(8);  // espaço vertical entre linhas
 
         // adição dos campos ao GridPane
-        painelCampos.add(new Label("Tipo do Exame:"), 0, 0);
+        painelCampos.add(new Label("Tipo do Exame *:"), 0, 0);
         painelCampos.add(txtTipo, 1, 0);
 
-        painelCampos.add(new Label("Data de Realização:"), 0, 1);
+        painelCampos.add(new Label("Data de Realização *:"), 0, 1);
         painelCampos.add(dpDataRealizacao, 1, 1);
 
-        painelCampos.add(new Label("Resultado:"), 0, 2);
+        painelCampos.add(new Label("Resultado (opcional):"), 0, 2);
         painelCampos.add(txtResultado, 1, 2);
 
-        painelCampos.add(new Label("Observação:"), 0, 3);
+        painelCampos.add(new Label("Observação (opcional):"), 0, 3);
         painelCampos.add(txtObservacao, 1, 3);
 
-        painelCampos.add(new Label("Nome do Paciente:"), 0, 4);
-        painelCampos.add(txtNomePaciente, 1, 4);
+        painelCampos.add(new Label("Status *:"), 0, 4);
+        cbStatus.getItems().addAll("Solicitado", "Aguardando resultado", "Concluido");
+        painelCampos.add(cbStatus, 1, 4);
+
+        painelCampos.add(new Label("Paciente *:"), 0, 5); 
+        cbNomePaciente.setItems(control.carregarNomesPacientes());
+        painelCampos.add(cbNomePaciente, 1, 5);
 
         // botões
         Button btnSalvar = new Button("Salvar");
         Button btnPesquisar = new Button("Pesquisar");
         Button btnNovo = new Button("Novo");
 
-        painelCampos.add(btnNovo, 0, 5);
-        painelCampos.add(btnSalvar, 1, 5);
-        painelCampos.add(btnPesquisar, 2, 5);
+        painelCampos.add(btnNovo, 0, 6);
+        painelCampos.add(btnSalvar, 1, 6);
+        painelCampos.add(btnPesquisar, 2, 6);
 
         painelPrincipal.setTop(painelCampos);
         painelPrincipal.setCenter(table);
@@ -81,7 +88,14 @@ public class ExameBoundary {
         Bindings.bindBidirectional(txtTipo.textProperty(), control.tipoProperty());
         Bindings.bindBidirectional(txtResultado.textProperty(), control.resultadoProperty());
         Bindings.bindBidirectional(txtObservacao.textProperty(), control.observacaoProperty());
-        Bindings.bindBidirectional(txtNomePaciente.textProperty(), control.nomePacienteProperty());
+        cbNomePaciente.valueProperty().addListener((obs, anterior, novo) -> control.nomePacienteProperty().set(novo));
+        control.nomePacienteProperty().addListener((obs, anterior, novo) -> cbNomePaciente.setValue(novo));
+        cbStatus.valueProperty().addListener((obs, anterior, novo) -> control.statusProperty().set(novo));
+        control.statusProperty().addListener((obs, anterior, novo) -> cbStatus.setValue(novo));        Bindings.bindBidirectional(cbStatus.valueProperty(), control.statusProperty());
+
+        txtTipo.setPromptText("Obrigatorio");
+        txtResultado.setPromptText("Opcional");
+        txtObservacao.setPromptText("Opcional");
 
         // botao novo limpa o formulario
         btnNovo.setOnAction(e -> control.limparCampos());
@@ -130,6 +144,12 @@ public class ExameBoundary {
         colPaciente.setCellValueFactory(
             item -> new ReadOnlyStringWrapper(item.getValue().getNomePaciente())
         );
+
+        TableColumn<Exame, String> colStatus = new TableColumn<>("Status");
+        colStatus.setCellValueFactory(
+            item -> new ReadOnlyStringWrapper(item.getValue().getStatus())
+        );
+        table.getColumns().add(colStatus);
 
         TableColumn<Exame, Void> colAcoes = new TableColumn<>("Ações");
 

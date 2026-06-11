@@ -20,10 +20,9 @@ public class Exame {
     private String observacao = "";
 
     // nome do paciente que fez o exame
-    // Aqui tem que ser um paciente que esteja cadastrado no banco de dados, deve ser apenas uma seleção dos pacientes cadastrados
     private String nomePaciente = "";
 
-    // --- Getters e Setters ---
+    private String status = "";
 
     public long getId() { return id; }
     public void setId(long id) { this.id = id; }
@@ -42,6 +41,9 @@ public class Exame {
 
     public String getNomePaciente() { return nomePaciente; }
     public void setNomePaciente(String nomePaciente) { this.nomePaciente = nomePaciente; }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
     // usado em logs pra identificar o exame rapidamente
     @Override

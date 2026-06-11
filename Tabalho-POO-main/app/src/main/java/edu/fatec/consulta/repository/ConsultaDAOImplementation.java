@@ -17,7 +17,7 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
         "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
 
     private static final String USUARIO = "root";
-    private static final String SENHA = "admin26";
+    private static final String SENHA = "";
 
     private Connection conexao;
 

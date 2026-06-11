@@ -28,6 +28,7 @@ public class ExameControl {
     private StringProperty resultado = new SimpleStringProperty("");
     private StringProperty observacao = new SimpleStringProperty("");
     private StringProperty nomePaciente = new SimpleStringProperty("");
+    private StringProperty status = new SimpleStringProperty("");
 
     // toda operacao de banco passa pelo dao
     private ExameDAO dao = new ExameDAOImplementation();
@@ -46,6 +47,7 @@ public class ExameControl {
             resultado.set(exame.getResultado());
             observacao.set(exame.getObservacao());
             nomePaciente.set(exame.getNomePaciente());
+            status.set(exame.getStatus());
         }
     }
 
@@ -58,6 +60,7 @@ public class ExameControl {
         exame.setResultado(resultado.get());
         exame.setObservacao(observacao.get());
         exame.setNomePaciente(nomePaciente.get());
+        exame.setStatus(status.get());
         return exame;
     }
 
@@ -69,42 +72,33 @@ public class ExameControl {
         resultado.set("");
         observacao.set("");
         nomePaciente.set("");
+        status.set("");
     }
 
     // valida os campos obrigatorios - retorna mensagem do campo com erro
     public String validar() {
-        if (tipo.get().isBlank()){
-            return "Preencha o campo Tipo do Exame.";
+        if(tipo.get().isBlank()){
+            return "Preencha o campo Tipo do Exame *";
         }
             
-        if (tipo.get().length() < 3){
+        if(tipo.get().length() < 3){
             return "Tipo do Exame deve ter ao menos 3 caracteres.";
         }
             
-        if (dataRealizacao.get() == null){
-            return "Preencha a Data de Realização.";
+        if(dataRealizacao.get() == null){
+            return "Preencha a Data de Realização *";
         }
             
-        if (dataRealizacao.get().isAfter(LocalDate.now())){
-            return "A data de realização não pode ser no futuro.";
+        if(nomePaciente.get() == null || nomePaciente.get().isBlank()){
+            return "Selecione o Nome do Paciente *";
         }
             
-        if (resultado.get().isBlank()){
-            return "Preencha o campo Resultado.";
+        if(status.get() == null || status.get().isBlank()){
+            return "Selecione o Status *";
         }
-            
-        if (resultado.get().length() < 3){
-            return "Resultado deve ter ao menos 3 caracteres.";
-        }
-            
-        if (nomePaciente.get().isBlank()){
-            return "Preencha o campo Nome do Paciente.";
-        }
-            
-        if (nomePaciente.get().length() < 3){
-            return "Nome do Paciente deve ter ao menos 3 caracteres.";
-        }
-            
+
+        if(status.get().equals("Concluido") && resultado.get().isBlank())
+            return "Preencha o Resultado pois o status e Concluido *";
         return "";
     }
 
@@ -141,6 +135,26 @@ public class ExameControl {
         lista.addAll(dao.pesquisarPorTipo(getTipo()));
     }
 
+    // busca os nomes dos pacientes cadastrados no banco
+    public ObservableList<String> carregarNomesPacientes() {
+        ObservableList<String> nomes = FXCollections.observableArrayList();
+        try {
+            java.sql.Connection con = java.sql.DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false",
+                "root", ""
+            );
+            java.sql.PreparedStatement stm = con.prepareStatement("SELECT nome FROM paciente");
+            java.sql.ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                nomes.add(rs.getString("nome"));
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Erro ao carregar pacientes");
+            e.printStackTrace();
+        }
+        return nomes;
+    }
+
     public String getTipo() { return tipo.get(); }
     
     public StringProperty tipoProperty() { return tipo; }
@@ -152,6 +166,8 @@ public class ExameControl {
     public StringProperty observacaoProperty() { return observacao; }
 
     public StringProperty nomePacienteProperty() { return nomePaciente; }
+
+    public StringProperty statusProperty() { return status; }
 
     public ObservableList<Exame> getLista() { return lista; }
 }

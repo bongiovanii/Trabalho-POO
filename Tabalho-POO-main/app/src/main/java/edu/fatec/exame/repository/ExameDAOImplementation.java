@@ -17,7 +17,7 @@ public class ExameDAOImplementation implements ExameDAO {
         "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
 
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "admin26";
+    private static final String DB_PASS = "";
 
     private Connection conexao;
 
@@ -28,10 +28,10 @@ public class ExameDAOImplementation implements ExameDAO {
             System.out.println("Driver carregado...");
             conexao = DriverManager.getConnection(DB_URI, DB_USER, DB_PASS);
             System.out.println("Conectado ao banco de dados clinica...");
-        } catch (ClassNotFoundException e) {
+        } catch(ClassNotFoundException e) {
             System.out.println("Erro: driver MySQL não encontrado.");
             e.printStackTrace();
-        } catch (SQLException e) {
+        } catch(SQLException e) {
             System.out.println("Erro ao conectar no banco de dados.");
             e.printStackTrace();
         }
@@ -41,8 +41,8 @@ public class ExameDAOImplementation implements ExameDAO {
     @Override
     public void cadastrar(Exame exame) {
         try {
-            String sql = "INSERT INTO exame (tipo, data_realizacao, resultado, observacao, nome_paciente) " +
-                         "VALUES (?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO exame (tipo, data_realizacao, resultado, observacao, nome_paciente, status) " +
+                "VALUES (?, ?, ?, ?, ?, ?)";
 
             PreparedStatement comando = conexao.prepareStatement(sql);
             comando.setString(1, exame.getTipo());
@@ -50,6 +50,7 @@ public class ExameDAOImplementation implements ExameDAO {
             comando.setString(3, exame.getResultado());
             comando.setString(4, exame.getObservacao());
             comando.setString(5, exame.getNomePaciente());
+            comando.setString(6, exame.getStatus());
 
             comando.executeUpdate();
             System.out.println("Exame cadastrado com sucesso.");
@@ -81,7 +82,7 @@ public class ExameDAOImplementation implements ExameDAO {
     public void atualizar(long id, Exame e) {
         try {
             String sql = "UPDATE exame SET tipo=?, data_realizacao=?, resultado=?, " +
-                         "observacao=?, nome_paciente=? WHERE id=?";
+                "observacao=?, nome_paciente=?, status=? WHERE id=?";
 
             PreparedStatement comando = conexao.prepareStatement(sql);
             comando.setString(1, e.getTipo());
@@ -89,7 +90,8 @@ public class ExameDAOImplementation implements ExameDAO {
             comando.setString(3, e.getResultado());
             comando.setString(4, e.getObservacao());
             comando.setString(5, e.getNomePaciente());
-            comando.setLong(6, id);
+            comando.setString(6, e.getStatus());
+            comando.setLong(7, id);
 
             comando.executeUpdate();
             System.out.println("Exame atualizado com sucesso.");
@@ -120,6 +122,7 @@ public class ExameDAOImplementation implements ExameDAO {
                 exame.setResultado(rs.getString("resultado"));
                 exame.setObservacao(rs.getString("observacao"));
                 exame.setNomePaciente(rs.getString("nome_paciente"));
+                exame.setStatus(rs.getString("status"));
                 listaExames.add(exame);
             }
             System.out.println("Exames carregados: " + listaExames.size());

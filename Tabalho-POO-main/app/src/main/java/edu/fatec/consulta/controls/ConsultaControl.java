@@ -60,24 +60,16 @@ public class ConsultaControl {
 
     // valida os campos obrigatorios e regras de negocio
     public String validar() {
-        if (nomePaciente.get().isBlank()){
-            return "Preencha o campo Nome do Paciente.";
-        }
-            
-        if (nomePaciente.get().length() < 3){
-            return "Nome do Paciente deve ter ao menos 3 caracteres.";
+        if (nomePaciente.get().isBlank() || nomePaciente.get() == null){
+            return "Preencha o campo Nome do Paciente *";
         }
 
-        if (nomeMedico.get().isBlank()){
-            return "Preencha o campo Nome do Médico.";
-        }
-            
-        if (nomeMedico.get().length() < 3){
-            return "Nome do Médico deve ter ao menos 3 caracteres.";
+        if (nomeMedico.get().isBlank() || nomeMedico.get() == null){
+            return "Preencha o campo Nome do Médico *";
         }
             
         if (dataConsulta.get() == null){
-            return "Preencha a Data da Consulta.";
+            return "Preencha a Data da Consulta *";
         }
             
         if (dataConsulta.get().isBefore(LocalDate.of(1900, 1, 1))){
@@ -85,7 +77,7 @@ public class ConsultaControl {
         }
             
         if (status.get() == null || status.get().isBlank()){
-            return "Selecione o Status da Consulta.";
+            return "Selecione o Status da Consulta *";
         }
             
         return "";
@@ -130,6 +122,46 @@ public class ConsultaControl {
     public void pesquisar() {
         listaConsultas.clear();
         listaConsultas.addAll(dao.pesquisarPorPaciente(getNomePaciente()));
+    }
+
+    // busca os nomes dos pacientes cadastrados no banco
+    public ObservableList<String> carregarNomesPacientes() {
+        ObservableList<String> nomes = FXCollections.observableArrayList();
+        try {
+            java.sql.Connection con = java.sql.DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false",
+                "root", ""
+            );
+            java.sql.PreparedStatement stm = con.prepareStatement("SELECT nome FROM paciente");
+            java.sql.ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                nomes.add(rs.getString("nome"));
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Erro ao carregar pacientes");
+            e.printStackTrace();
+        }
+        return nomes;
+    }
+
+    // busca os nomes dos medicos cadastrados no banco
+    public ObservableList<String> carregarNomesMedicos() {
+        ObservableList<String> nomes = FXCollections.observableArrayList();
+        try {
+            java.sql.Connection con = java.sql.DriverManager.getConnection(
+                "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false",
+                "root", ""
+            );
+            java.sql.PreparedStatement stm = con.prepareStatement("SELECT nome FROM medico");
+            java.sql.ResultSet rs = stm.executeQuery();
+            while (rs.next()) {
+                nomes.add(rs.getString("nome"));
+            }
+        } catch (java.sql.SQLException e) {
+            System.out.println("Erro ao carregar medicos");
+            e.printStackTrace();
+        }
+        return nomes;
     }
 
     public String getNomePaciente() { return nomePaciente.get(); }

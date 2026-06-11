@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS medico(
 -- Tabela de exames médicos
 CREATE TABLE IF NOT EXISTS exame (
     id               BIGINT AUTO_INCREMENT PRIMARY KEY,
-    tipo             VARCHAR(100)  NOT NULL,           -- ex: Sangue, Raio-X, Ultrassom
+    tipo             VARCHAR(100)  NOT NULL,          
     data_realizacao  DATE          NOT NULL,
     resultado        VARCHAR(255)  NOT NULL,
     observacao       VARCHAR(255),
@@ -57,7 +57,7 @@ CREATE TABLE IF NOT EXISTS consulta (
     nome_paciente   VARCHAR(100)  NOT NULL,
     nome_medico     VARCHAR(100)  NOT NULL,
     diagnostico     VARCHAR(255),
-    status          VARCHAR(50)   NOT NULL,            -- ex: Agendada, Realizada, Cancelada
+    status          VARCHAR(50)   NOT NULL,            
     created_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at      TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     INDEX idx_nome_paciente (nome_paciente),

@@ -2,3 +2,5 @@ echo "*.class" >> .gitignore
 echo "bin/" >> .gitignore
 echo "build/" >> .gitignore
 echo ".gradle/" >> .gitignore
+Add-Content .gitignore ".gradle/"
+Add-Content .gitignore "build/"

@@ -30,8 +30,8 @@ public class ConsultaBoundary {
     private ConsultaControl control = new ConsultaControl();
 
     // campos do formulario
-    private TextField txtNomeMedico = new TextField();
-    private TextField txtNomePaciente = new TextField();
+    private ComboBox<String> cbNomeMedico = new ComboBox<>();
+    private ComboBox<String> cbNomePaciente = new ComboBox<>();
     private DatePicker dpDataConsulta = new DatePicker(LocalDate.now());
     private TextField txtDiagnostico  = new TextField();
     private ComboBox<String> cbStatus = new ComboBox<>();
@@ -48,20 +48,22 @@ public class ConsultaBoundary {
         painelCampos.setVgap(8);
 
         // adiciona labels e campos no grid (coluna, linha)
-        painelCampos.add(new Label("Nome do Médico:"),  0, 0);
-        painelCampos.add(txtNomeMedico, 1, 0);
+        painelCampos.add(new Label("Nome do Médico *:"),  0, 0);
+        cbNomeMedico.setItems(control.carregarNomesMedicos());
+        painelCampos.add(cbNomeMedico, 1, 0);
 
-        painelCampos.add(new Label("Nome do Paciente:"), 0, 1);
-        painelCampos.add(txtNomePaciente, 1, 1);
+        painelCampos.add(new Label("Nome do Paciente *:"), 0, 1);
+        cbNomePaciente.setItems(control.carregarNomesPacientes());
+        painelCampos.add(cbNomePaciente, 1, 1);
 
-        painelCampos.add(new Label("Data da Consulta:"), 0, 2);
+        painelCampos.add(new Label("Data da Consulta * :"), 0, 2);
         painelCampos.add(dpDataConsulta, 1, 2);
 
-        painelCampos.add(new Label("Diagnóstico:"), 0, 3);
+        painelCampos.add(new Label("Diagnóstico (opcional):"), 0, 3);
         painelCampos.add(txtDiagnostico,  1, 3);
 
+        painelCampos.add(new Label("Status *:"), 0, 4);
         cbStatus.getItems().addAll("Agendada", "Realizada", "Cancelada");
-        painelCampos.add(new Label("Status:"), 0, 4);
         painelCampos.add(cbStatus, 1, 4);
 
         Button btnSalvar = new Button("Salvar");
@@ -72,16 +74,21 @@ public class ConsultaBoundary {
         painelCampos.add(btnNovo, 1, 5);
         painelCampos.add(btnPesquisar, 2, 5);
 
+        txtDiagnostico.setPromptText("Opcional");
+
         // BorderPane: Top = formulario, Center = tabela
         BorderPane painelPrincipal = new BorderPane();
         painelPrincipal.setTop(painelCampos);
         painelPrincipal.setCenter(tabela);
 
         // binding bidirecional - campo e property ficam sincronizados
-        Bindings.bindBidirectional(txtNomeMedico.textProperty(), control.nomeMedicoProperty());
-        Bindings.bindBidirectional(txtNomePaciente.textProperty(), control.nomePacienteProperty());
+        cbNomeMedico.valueProperty().addListener((obs, anterior, novo) -> control.nomeMedicoProperty().set(novo));
+        control.nomeMedicoProperty().addListener((obs, anterior, novo) -> cbNomeMedico.setValue(novo));
+        cbNomePaciente.valueProperty().addListener((obs, anterior, novo) -> control.nomePacienteProperty().set(novo));
+        control.nomePacienteProperty().addListener((obs, anterior, novo) -> cbNomePaciente.setValue(novo));
         Bindings.bindBidirectional(txtDiagnostico.textProperty(), control.diagnosticoProperty());
-        Bindings.bindBidirectional(cbStatus.valueProperty(), control.statusProperty());
+        cbStatus.valueProperty().addListener((obs, anterior, novo) -> control.statusProperty().set(novo));
+        control.statusProperty().addListener((obs, anterior, novo) -> cbStatus.setValue(novo));
         Bindings.bindBidirectional(dpDataConsulta.valueProperty(), control.dataConsultaProperty());
 
         // botao salvar valida antes de gravar

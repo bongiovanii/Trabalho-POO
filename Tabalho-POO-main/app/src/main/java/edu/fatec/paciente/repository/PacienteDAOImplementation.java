@@ -6,13 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
+
 import edu.fatec.paciente.model.Paciente;
 
 public class PacienteDAOImplementation implements PacienteDAO {
     // Criando constantes para a conexão com o banco de dados
     private static final String URL = "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "admin26";
+    private static final String DB_PASS = "";
 
     // Instanciando nova conexão com o banco de dados
     private Connection connection;
