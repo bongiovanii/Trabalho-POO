@@ -39,4 +39,4 @@ Sistema desktop de gerenciamento de clínica médica que permite o cadastro e co
 | Gustavo Santos Bongiovani de Oliveira | Entidades Paciente e Médico (model, controls, repository, view), tela principal e menu de navegação |
 
 ## Link do Vídeo
-<!-- Adicione aqui o link do YouTube após gravar o vídeo -->
+https://youtu.be/MZ7R2mM8t10
