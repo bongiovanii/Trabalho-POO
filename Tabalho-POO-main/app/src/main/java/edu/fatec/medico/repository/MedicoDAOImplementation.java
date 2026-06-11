@@ -13,7 +13,7 @@ public class MedicoDAOImplementation implements MedicoDAO {
     // URL de conexão com o banco de dados MySQL, incluindo parâmetros paracriar o banco de dados se ele não existir
     private static final String URL = "jdbc:mysql://localhost:3306/clinica?allowPublicKeyRetrieval=true&useSSL=false&createDatabaseIfNotExist=true";
     private static final String DB_USER = "root";
-    private static final String DB_PASS = "admin26";
+    private static final String DB_PASS = "";
 
     private Connection connection;
 
