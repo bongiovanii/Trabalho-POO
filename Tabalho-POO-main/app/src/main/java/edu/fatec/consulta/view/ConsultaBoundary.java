@@ -24,12 +24,21 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.util.Callback;
 
-// Tela do CRUD de Consulta
+// tela do CRUD de Consulta
+// so cuida da parte visual - logica e validacao ficam no ConsultaControl
+// monta o formulario, configura a tabela e trata os eventos dos botoes
 public class ConsultaBoundary {
 
     private ConsultaControl control = new ConsultaControl();
 
-    // campos do formulario
+    // control e instanciado aqui pra ja carregar os dados do banco ao abrir a tela
+
+    // campos do formulario - ComboBox pra medico e paciente pois buscam do banco
+    // DatePicker pra data pois facilita a selecao e evita erros de digitacao
+    // TextField simples pro diagnostico pois e texto livre e opcional
+
+    // tabela que exibe todas as consultas cadastradas
+    // formatoData converte LocalDate pro padrao brasileiro dd/MM/yyyy
     private ComboBox<String> cbNomeMedico = new ComboBox<>();
     private ComboBox<String> cbNomePaciente = new ComboBox<>();
     private DatePicker dpDataConsulta = new DatePicker(LocalDate.now());
@@ -43,11 +52,15 @@ public class ConsultaBoundary {
 
     public Pane render() {
 
+        // GridPane organiza os campos em linhas e colunas (label | campo)
+        // BorderPane divide a tela: Top = formulario, Center = tabela
         GridPane painelCampos = new GridPane();
         painelCampos.setHgap(10);
         painelCampos.setVgap(8);
 
         // adiciona labels e campos no grid (coluna, linha)
+        // carrega os nomes do banco ao montar a tela
+        // se nao tiver medico ou paciente cadastrado, o ComboBox fica vazio
         painelCampos.add(new Label("Nome do Médico *:"),  0, 0);
         cbNomeMedico.setItems(control.carregarNomesMedicos());
         painelCampos.add(cbNomeMedico, 1, 0);
@@ -66,6 +79,7 @@ public class ConsultaBoundary {
         cbStatus.getItems().addAll("Agendada", "Realizada", "Cancelada");
         painelCampos.add(cbStatus, 1, 4);
 
+        // tres botoes: Salvar grava no banco, Novo limpa o formulario, Pesquisar filtra a tabela
         Button btnSalvar = new Button("Salvar");
         Button btnNovo = new Button("Novo");
         Button btnPesquisar = new Button("Pesquisar");
@@ -81,7 +95,11 @@ public class ConsultaBoundary {
         painelPrincipal.setTop(painelCampos);
         painelPrincipal.setCenter(tabela);
 
-        // binding bidirecional - campo e property ficam sincronizados
+        // os ComboBox nao aceitam bindBidirectional direto com StringProperty
+        // por isso listeners manuais nos dois sentidos:
+        // - quando o usuario seleciona no ComboBox, atualiza a property do Control
+        // - quando o Control limpa os campos, atualiza o ComboBox na tela
+        // o TextField e o DatePicker aceitam bindBidirectional normalmente
         cbNomeMedico.valueProperty().addListener((obs, anterior, novo) -> control.nomeMedicoProperty().set(novo));
         control.nomeMedicoProperty().addListener((obs, anterior, novo) -> cbNomeMedico.setValue(novo));
         cbNomePaciente.valueProperty().addListener((obs, anterior, novo) -> control.nomePacienteProperty().set(novo));
@@ -91,7 +109,8 @@ public class ConsultaBoundary {
         control.statusProperty().addListener((obs, anterior, novo) -> cbStatus.setValue(novo));
         Bindings.bindBidirectional(dpDataConsulta.valueProperty(), control.dataConsultaProperty());
 
-        // botao salvar valida antes de gravar
+        // valida antes de salvar - se tiver erro mostra o Alert com a mensagem do campo
+        // se tudo ok, chama salvar() no Control e mostra confirmacao
         btnSalvar.setOnAction(e -> {
             String mensagemErro = control.validar();
             if (!mensagemErro.isEmpty()) {
@@ -106,7 +125,8 @@ public class ConsultaBoundary {
 
         btnPesquisar.setOnAction(e -> control.pesquisar());
 
-        // quando clica numa linha, preenche o formulario pra edicao
+        // quando o usuario clica numa linha, fromEntity preenche o formulario com os dados
+        // assim o usuario pode editar e salvar novamente
         tabela.getSelectionModel().selectedItemProperty().addListener(
             (obs, anterior, selecionado) -> control.fromEntity(selecionado)
         );
@@ -136,6 +156,9 @@ public class ConsultaBoundary {
 
         TableColumn<Consulta, Void> colAcoes = new TableColumn<>("Ações");
 
+        // coluna de acoes tem um botao Apagar em cada linha
+        // o callback define como cada celula dessa coluna e renderizada
+        // celulas vazias (sem dados) nao exibem o botao
         Callback<TableColumn<Consulta, Void>, TableCell<Consulta, Void>> callback =
             new Callback<>() {
                 public TableCell<Consulta, Void> call(TableColumn<Consulta, Void> coluna) {
@@ -177,7 +200,8 @@ public class ConsultaBoundary {
         tabela.getColumns().add(colStatus);
         tabela.getColumns().add(colAcoes);
 
-        // liga a tabela a lista do control
+        // liga a tabela a ObservableList do Control
+        // qualquer alteracao na lista (salvar, apagar) reflete automaticamente na tabela
         tabela.setItems(control.getLista());
 
         return painelPrincipal;

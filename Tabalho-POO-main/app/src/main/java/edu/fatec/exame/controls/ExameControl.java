@@ -16,6 +16,7 @@ import javafx.collections.ObservableList;
 
 // Control do CRUD de Exame
 // faz a ponte entre a tela (Boundary) e o banco (DAO)
+// aqui fica toda a logica: validacao, conversao de dados e chamadas ao banco
 public class ExameControl {
 
     // lista que alimenta o TableView - quando muda, a tabela atualiza sozinha
@@ -38,7 +39,9 @@ public class ExameControl {
         carregar();
     }
 
-    // preenche os campos quando o usuario clica numa linha da tabela
+    // preenche as properties com os dados da consulta selecionada na tabela
+    // quando o usuario clica numa linha, esse metodo e chamado automaticamente
+    // pelo listener de selecao la na Boundary
     public void fromEntity(Exame exame) {
         if (exame != null) {
             id.set(exame.getId());
@@ -51,7 +54,9 @@ public class ExameControl {
         }
     }
 
-    // monta o objeto Exame com os valores atuais dos campos
+    // monta um objeto Exame com os valores atuais das properties
+    // chamado antes de enviar os dados pro banco (salvar ou atualizar)
+    // se o id for 0 e novo registro, se for maior que 0 e edicao
     public Exame toEntity() {
         Exame exame = new Exame();
         exame.setId(id.get());

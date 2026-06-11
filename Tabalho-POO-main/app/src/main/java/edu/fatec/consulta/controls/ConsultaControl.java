@@ -14,7 +14,9 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
+// Control do CRUD de Consulta
 // faz a ponte entre a tela (Boundary) e o banco (DAO)
+// aqui fica toda a logica: validacao, conversao de dados e chamadas ao banco
 public class ConsultaControl {
 
     // toda operacao de banco passa pelo dao
@@ -35,6 +37,9 @@ public class ConsultaControl {
         carregar();
     }
 
+    // monta um objeto Consulta com os valores atuais das properties
+    // chamado antes de enviar os dados pro banco (salvar ou atualizar)
+    // se o id for 0 e novo registro, se for maior que 0 e edicao
     public Consulta toEntity() {
         Consulta consulta = new Consulta();
         consulta.setId(id.get());
@@ -45,8 +50,10 @@ public class ConsultaControl {
         consulta.setStatus(status.get());
         return consulta;
     }
-
-    // preenche os campos quando o usuario clica numa linha da tabela
+        
+    // preenche as properties com os dados da consulta selecionada na tabela
+    // quando o usuario clica numa linha, esse metodo e chamado automaticamente
+    // pelo listener de selecao la na Boundary
     public void fromEntity(Consulta consulta) {
         if (consulta != null) {
             id.set(consulta.getId());
@@ -58,7 +65,10 @@ public class ConsultaControl {
         }
     }
 
-    // valida os campos obrigatorios e regras de negocio
+    // verifica os campos obrigatorios antes de salvar
+    // retorna a mensagem do primeiro campo invalido que encontrar
+    // se tudo estiver ok, retorna string vazia
+    // a Boundary exibe essa mensagem num Alert de aviso
     public String validar() {
         if (nomePaciente.get().isBlank() || nomePaciente.get() == null){
             return "Preencha o campo Nome do Paciente *";
@@ -83,7 +93,9 @@ public class ConsultaControl {
         return "";
     }
 
-    // limpa o formulario pra cadastrar uma nova consulta
+    // reseta todas as properties pro valor padrao
+    // chamado apos salvar ou quando o usuario clica no botao Novo
+    // o id volta pra 0 indicando que o proximo salvar sera um INSERT e nao UPDATE
     public void limparCampos() {
         id.set(0);
         nomeMedico.set("");
@@ -93,7 +105,9 @@ public class ConsultaControl {
         status.set("");
     }
 
-    // salva ou atualiza dependendo se ja tem id
+    // decide se vai cadastrar ou atualizar baseado no id
+    // id = 0 significa registro novo, id > 0 significa edicao
+    // apos salvar, limpa o formulario e recarrega a lista da tabela
     public void salvar() {
         Consulta consulta = toEntity();
         if (id.get() > 0) {
@@ -105,26 +119,32 @@ public class ConsultaControl {
         carregar();
     }
 
-    // apaga a consulta da linha selecionada na tabela
+    // busca o objeto na lista pelo indice da linha selecionada na tabela
+    // deleta no banco e recarrega a lista
     public void apagar(int indice) {
         Consulta consulta = listaConsultas.get(indice);
         dao.apagar(consulta);
         carregar();
     }
 
-    // recarrega a lista do banco
+    // busca todas as consultas do banco e popula a lista
+    // chamado no construtor pra ja ter dados quando a tela abrir
+    // e chamado apos qualquer operacao de escrita pra manter a tabela atualizada
     public void carregar() {
         listaConsultas.clear();
         listaConsultas.addAll(dao.pesquisarPorPaciente(""));
     }
 
-    // filtra a tabela pelo nome do paciente digitado
+    // filtra a lista pelo nome do paciente digitado no campo de pesquisa
+    // usa o mesmo metodo do DAO com LIKE, entao aceita texto parcial
     public void pesquisar() {
         listaConsultas.clear();
         listaConsultas.addAll(dao.pesquisarPorPaciente(getNomePaciente()));
     }
 
-    // busca os nomes dos pacientes cadastrados no banco
+    // abre uma conexao separada e busca todos os nomes da tabela paciente
+    // usado pra popular o ComboBox de paciente na tela
+    // retorna lista vazia se nao tiver pacientes cadastrados ou der erro
     public ObservableList<String> carregarNomesPacientes() {
         ObservableList<String> nomes = FXCollections.observableArrayList();
         try {
@@ -144,7 +164,8 @@ public class ConsultaControl {
         return nomes;
     }
 
-    // busca os nomes dos medicos cadastrados no banco
+    // mesma logica do carregarNomesPacientes, so que pra tabela medico
+    // usado pra popular o ComboBox de medico na tela
     public ObservableList<String> carregarNomesMedicos() {
         ObservableList<String> nomes = FXCollections.observableArrayList();
         try {

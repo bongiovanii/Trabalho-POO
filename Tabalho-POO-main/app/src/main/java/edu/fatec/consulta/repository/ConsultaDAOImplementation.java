@@ -10,7 +10,9 @@ import java.util.List;
 
 import edu.fatec.consulta.model.Consulta;
 
-// Implementacao do DAO usando JDBC com MySQL
+// implementacao concreta do ConsultaDAO usando JDBC com MySQL
+// toda comunicacao com o banco de dados acontece aqui
+// os outros arquivos (Control, Boundary) nao sabem nada de SQL
 public class ConsultaDAOImplementation implements ConsultaDAO {
 
     private static final String URL_BANCO =
@@ -21,7 +23,9 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
 
     private Connection conexao;
 
-    // abre conexao com o banco ao criar o objeto
+    // carrega o driver MySQL e abre a conexao ao criar o objeto
+    // a conexao fica aberta e e reutilizada em todos os metodos
+    // se der erro aqui, os outros metodos vao falhar com NullPointerException na conexao
     public ConsultaDAOImplementation() {
         try {
             Class.forName("com.mysql.cj.jdbc.Driver");
@@ -37,7 +41,9 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
         }
     }
 
-    // atualiza os dados de uma consulta ja existente
+    // atualiza todos os campos da consulta identificada pelo id
+    // o id vai no ultimo ? por causa da clausula WHERE no final do SQL
+    // LocalDate precisa ser convertido pra java.sql.Date pro JDBC entender
     @Override
     public void atualizar(long id, Consulta consulta) {
         try {
@@ -61,7 +67,9 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
         }
     }
 
-    // insere uma nova consulta na tabela
+    // insere uma nova linha na tabela consulta
+    // o id nao e passado pois e gerado automaticamente pelo AUTO_INCREMENT do banco
+    // a ordem dos setString deve bater com a ordem dos campos no INSERT
     @Override
     public void cadastrar(Consulta consulta) {
         try {
@@ -83,7 +91,8 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
         }
     }
 
-    // deleta a consulta usando o id como referencia
+    // deleta a consulta usando o id como chave primaria
+    // o objeto inteiro e passado mas so o id e usado
     @Override
     public void apagar(Consulta consulta) {
         try {
@@ -100,7 +109,10 @@ public class ConsultaDAOImplementation implements ConsultaDAO {
         }
     }
 
-    // busca por nome do paciente com LIKE - % nas duas pontas = pesquisa parcial
+    // busca consultas filtrando pelo nome do paciente
+    // o % nas duas pontas do LIKE permite pesquisa parcial
+    // passando string vazia retorna todas as consultas
+    // para cada linha do banco, monta um objeto Consulta e adiciona na lista
     @Override
     public List<Consulta> pesquisarPorPaciente(String nomePaciente) {
         List<Consulta> listaConsultas = new ArrayList<>();
